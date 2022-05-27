@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "142555775123",
+    "project_id": "gmp3-77a95",
+    "storage_bucket": "gmp3-77a95.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:142555775123:android:0723c78804ca5ae278cd66",
+        "android_client_info": {
+          "package_name": "com.nikle.gmp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "142555775123-6she524d79mplv74c8ea48021b15kd2i.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nikle.gmp",
+            "certificate_hash": "4c55b4a001cacfb4e8237001d37dcc1282bad2d7"
+          }
+        },
+        {
+          "client_id": "142555775123-cqoaul754nj6e1e791u2ma3beqeo2ghu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.nikle.gmp",
+            "certificate_hash": "39a57f854fee25cdcc50e6a9ff45e58c6bd8e700"
+          }
+        },
+        {
+          "client_id": "142555775123-0kmtigpc1cmoa7efnlsilo0ldssb72ec.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCMFf4EwhZadwso8Ms1-lqpH7Y8MH6nIPA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "142555775123-0kmtigpc1cmoa7efnlsilo0ldssb72ec.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "142555775123-18cu3aar4aclpq6n32bo8qmpluejgh3p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.gmp.nikle"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
