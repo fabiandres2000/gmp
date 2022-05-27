@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:gmp/src/screens/login.dart';
 import 'package:gmp/src/screens/principal/principal.dart';
 import 'package:gmp/src/settings/constantes.dart';
 import 'package:gmp/src/settings/size_config.dart';
@@ -88,7 +87,8 @@ class _CompaniasPageState extends State<CompaniasPage> {
                                     companias[index]['companias_id'].toString(),
                                     companias[index]['companias_login'],
                                     companias[index]['lat_ubic'],
-                                    companias[index]['long_ubi']);
+                                    companias[index]['long_ubi'], 
+                                    companias[index]['companias_descripcion']);
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
@@ -312,13 +312,14 @@ class _CompaniasPageState extends State<CompaniasPage> {
     return "Success!";
   }
 
-  ir(String id, String bd, String lat, String lng) {
+  ir(String id, String bd, String lat, String lng, String nombre) {
     //Timer(Duration(milliseconds: 1000), () {
     spreferences.setString("bd", "gmp_" + bd);
     spreferences.setString("empresa", bd);
     spreferences.setString("lat", lat ?? '');
     spreferences.setString("lng", lng ?? '');
     spreferences.setString("id_emp", id);
+    spreferences.setString("nombre_entidad", nombre);
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -421,7 +422,8 @@ class _CompaniasPageState extends State<CompaniasPage> {
         reponsebody["companias"]['companias_id'].toString(),
         reponsebody["companias"]['companias_login'],
         reponsebody["companias"]['lat_ubic'],
-        reponsebody["companias"]['long_ubi']);
+        reponsebody["companias"]['long_ubi'],
+        reponsebody["companias"]['companias_descripcion']);
 
     //print(reponsebody);
 

@@ -35,6 +35,8 @@ class _DashboardPageState extends State<DashboardPage> {
   String _mejecutado = "0";
   final oCcy = new NumberFormat("#,##0", "es_CO");
 
+  String nombreEntidad = "";
+
   @override
   Widget build(BuildContext context) {
     SizeConfig().init(context);
@@ -63,28 +65,13 @@ class _DashboardPageState extends State<DashboardPage> {
                       ),
                     ),
                     SizedBox(
-                      width: _sc.getProportionateScreenWidth(10),
+                      width: _sc.getProportionateScreenWidth(30),
                     ),
-                    Text(
-                      "Alcaldia de Valledupar",
+                    Text(nombreEntidad,
                       style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.w600,
                           color: kazuloscuro),
-                    ),
-                    Spacer(),
-                    Container(
-                      width: _sc.getProportionateScreenHeight(40),
-                      height: _sc.getProportionateScreenHeight(40),
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(10),
-                        image: DecorationImage(
-                            image: imagen == "noimage" || imagen == null
-                                ? NetworkImage("${URLROOT}/images/noimage.png")
-                                : NetworkImage("${URLROOT}/images/${imagen}"),
-                            fit: BoxFit.cover),
-                      ),
                     ),
                   ],
                 ),
@@ -352,6 +339,7 @@ class _DashboardPageState extends State<DashboardPage> {
   instanciar_sesion() async {
     spreferences = await SharedPreferences.getInstance();
     var bd = spreferences.getString("bd");
+    nombreEntidad = spreferences.getString("nombre_entidad");
     _secretarias = [];
     setState(() {
       imagen = spreferences.getString("imagen");
