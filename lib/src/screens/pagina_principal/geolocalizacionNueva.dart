@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +45,7 @@ class _CGeolocalizacionNuevaPageState extends State<GeolocalizacionNueva> {
   final oCcy = new NumberFormat("#,##0", "es_CO");
   Random random = new Random();
   double _currentSliderValue = 0;
-  bool loading = true;
+  bool loading = false;
   Utils utils = new Utils(); 
 
   @override
@@ -244,6 +245,11 @@ class _CGeolocalizacionNuevaPageState extends State<GeolocalizacionNueva> {
   }
 
   instanciarSesion() async {
+    if(Platform.isAndroid){
+      setState(() {
+        loading = true;
+      });
+    }
     spreferences = await SharedPreferences.getInstance();
     setState(() {
       imagen = spreferences.getString("imagen");
@@ -512,36 +518,46 @@ class _CGeolocalizacionNuevaPageState extends State<GeolocalizacionNueva> {
 
 
   filtrarProyectos() async {
+    
     setState(() {
       loading = true;
     });
-    entidadesInfo = [];
-    entidadesInfo.addAll(entidadesInfoOriginal);
-    geo.Position posicion = await this.determinePosition();
-    for (var x = 0; x < entidadesInfo.length; x++) {
-      for (var y = 0; y < entidadesInfo[x]["secretarias"].length; y++) {
-        entidadesInfo[x]["secretarias"][y]["cp"] = entidadesInfo[x]["secretarias"][y]["proyects"].length;
-        if(_currentSliderValue != 0){
-          for (var z = 0; z < entidadesInfo[x]["secretarias"][y]["proyects"].length; z++) {
-            var proyecto = entidadesInfo[x]["secretarias"][y]["proyects"][z];
-            var dis = utils.calcularDistancia(posicion, double.parse(proyecto["lat_ubic"]),  double.parse(proyecto["long_ubi"]));
-            if( dis > _currentSliderValue){
-              setState(() {
-                entidadesInfo[x]["secretarias"][y]["cp"] =  entidadesInfo[x]["secretarias"][y]["cp"] - 1;
-              }); 
+
+    try {
+      entidadesInfo = [];
+      entidadesInfo.addAll(entidadesInfoOriginal);
+      geo.Position posicion = await this.determinePosition();
+      for (var x = 0; x < entidadesInfo.length; x++) {
+        for (var y = 0; y < entidadesInfo[x]["secretarias"].length; y++) {
+          entidadesInfo[x]["secretarias"][y]["cp"] = entidadesInfo[x]["secretarias"][y]["proyects"].length;
+          if(_currentSliderValue != 0){
+            for (var z = 0; z < entidadesInfo[x]["secretarias"][y]["proyects"].length; z++) {
+              var proyecto = entidadesInfo[x]["secretarias"][y]["proyects"][z];
+              var dis = utils.calcularDistancia(posicion, double.parse(proyecto["lat_ubic"]),  double.parse(proyecto["long_ubi"]));
+              if( dis > _currentSliderValue){
+                setState(() {
+                  entidadesInfo[x]["secretarias"][y]["cp"] =  entidadesInfo[x]["secretarias"][y]["cp"] - 1;
+                }); 
+              }
             }
+          }else{
+            setState(() {
+              entidadesInfo[x]["secretarias"][y]["cp"] = entidadesInfo[x]["secretarias"][y]["proyects"].length;
+              loading = false;
+            });
           }
-        }else{
-          setState(() {
-            entidadesInfo[x]["secretarias"][y]["cp"] = entidadesInfo[x]["secretarias"][y]["proyects"].length;
-            loading = false;
-          });
         }
       }
+      setState(() {
+        loading = false;
+      });
+    } catch (e) {
+      print(e);
+      setState(() {
+        loading = false;
+      });
     }
-    setState(() {
-      loading = false;
-    });
+    
   }
 
   Future<geo.Position> determinePosition() async {
