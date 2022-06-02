@@ -736,7 +736,7 @@ Route::get('/comentarios', function () {
 	foreach($comentarios as $comentario){
 		$respuestas = DB::connection("mysql")->table($value.".comentarios")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
-			->select($value.".comentarios.comentario","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
 			->where($value.".comentarios.response",$comentario->id)
 			->get();
                 
@@ -826,7 +826,7 @@ Route::get('/comentarios_proyectos', function () {
 	foreach($comentarios as $comentario){
 		$respuestas = DB::connection("mysql")->table($value.".comentarios_proyectos")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
-			->select($value.".comentarios_proyectos.comentario","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
 			->where($value.".comentarios_proyectos.response",$comentario->id)
 			->get();
                 
@@ -853,7 +853,7 @@ Route::get('/comentarios_proyectos_respuestas', function () {
 	
 	$respuestas = DB::connection("mysql")->table($value.".comentarios_proyectos")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
-			->select($value.".comentarios_proyectos.comentario","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
 			->where($value.".comentarios_proyectos.response",$id)
 			->orderBy("comentarios_proyectos.id","asc")
 			->get();
@@ -871,7 +871,7 @@ Route::get('/comentarios_respuestas', function () {
 	
 	$respuestas = DB::connection("mysql")->table($value.".comentarios")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
-			->select($value.".comentarios.comentario","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
 			->where($value.".comentarios.response",$id)
 			->orderBy("comentarios.id","asc")
 			->get();
@@ -2215,4 +2215,93 @@ Route::get('/cambiar-estado-notificacion', function () {
 	$notificaciones = DB::connection("mysql")->select("UPDATE ".$value.".notificaciones SET estado=0 WHERE id = ".$id);
 
 	return response()->json(['ok' => "Ok"]);
+});
+
+
+Route::get('/comentario_proyectos', function () {
+    header("Access-Control-Allow-Origin: *");
+    $id = request()->get("id");
+    $value = request()->get("bd");
+	$data = request()->all();
+	
+	$comentarios = DB::connection("mysql")->table($value . ".comentarios_proyectos")
+		->where($value.".comentarios_proyectos.id",request()->get("id"))
+		->where("response","0")
+		->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
+		->select($value.".comentarios_proyectos.*","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+		->selectRaw("'false' as expandir")
+		->orderBy("id","desc")
+		->get();
+	
+	foreach($comentarios as $comentario){
+		$respuestas = DB::connection("mysql")->table($value.".comentarios_proyectos")
+			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
+			->select($value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->where($value.".comentarios_proyectos.response",$comentario->id)
+			->get();
+                
+                $contador = DB::connection("mysql")->table($value.".comentarios_proyectos")
+			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
+			->select($value.".comentarios_proyectos.comentario","bd_gmp2.users.nombre")
+			->where($value.".comentarios_proyectos.response",$comentario->id)
+			->count();
+                
+		$comentario->respuestas = $respuestas;
+                $comentario->response = $contador;
+		
+	}
+
+     return response()->json([
+		 		'comentario' => $comentarios
+    ]);
+});
+
+Route::get('/cambiar-estado-notificacion', function () {
+    header("Access-Control-Allow-Origin: *");
+    $id = request()->get("id_not");
+    $value = "bd_gmp2";
+	$data = request()->all();
+	
+	$notificaciones = DB::connection("mysql")->select("UPDATE ".$value.".notificaciones SET estado=0 WHERE id = ".$id);
+
+	return response()->json(['ok' => "Ok"]);
+});
+
+
+Route::get('/comentario_contratos', function () {
+    header("Access-Control-Allow-Origin: *");
+    $id = request()->get("id");
+    $value = request()->get("bd");
+	$data = request()->all();
+	
+	$comentarios = DB::connection("mysql")->table($value . ".comentarios")
+		->where($value.".comentarios.id",request()->get("id"))
+		->where("response","0")
+		->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
+		->select($value.".comentarios.*","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+		->selectRaw("'false' as expandir")
+		->orderBy("id","desc")
+		->get();
+	
+	foreach($comentarios as $comentario){
+		$respuestas = DB::connection("mysql")->table($value.".comentarios")
+			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
+			->select($value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->where($value.".comentarios.response",$comentario->id)
+			->get();
+                
+                $contador = DB::connection("mysql")->table($value.".comentarios")
+			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
+			->select($value.".comentarios.comentario","bd_gmp2.users.nombre")
+			->where($value.".comentarios.response",$comentario->id)
+			->count();
+                
+		$comentario->respuestas = $respuestas;
+                $comentario->response = $contador;
+		
+	}
+
+     return response()->json([
+		 		'comentario' => $comentarios
+    ]);
 });

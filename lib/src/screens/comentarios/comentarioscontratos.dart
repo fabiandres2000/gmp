@@ -68,12 +68,14 @@ SharedPreferences spreferences;
                   height: _sc.getProportionateScreenHeight(10),
                 ),
                 loading == false? Expanded(
-                  child: ListView.builder(
-                    itemCount:
-                    comentarios == null ? 0 : comentarios.length,
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      return VistaComentario(
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 50),
+                    child: ListView.builder(
+                      itemCount:
+                      comentarios == null ? 0 : comentarios.length,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        return VistaComentario(
                           comentarios: comentarios,
                           sc: _sc,
                           size: size,
@@ -81,9 +83,12 @@ SharedPreferences spreferences;
                           mres: "si",
                           tam: 0.75,
                           tipo: "contrato",
-                          idProyecto: widget.id_con);
+                          idProyecto: widget.id_con,
+                          fecha: comentarios[index]['fecha'],
+                          hora: comentarios[index]['hora']);
                       }
                     ),
+                  )
                 ): ShimmerItem(),
                 SizedBox(
                   height: _sc.getProportionateScreenHeight(15),

@@ -245,11 +245,11 @@ class _CGeolocalizacionNuevaPageState extends State<GeolocalizacionNueva> {
   }
 
   instanciarSesion() async {
-    if(Platform.isAndroid){
-      setState(() {
-        loading = true;
-      });
-    }
+   
+    setState(() {
+      loading = true;
+    });
+    
     spreferences = await SharedPreferences.getInstance();
     setState(() {
       imagen = spreferences.getString("imagen");

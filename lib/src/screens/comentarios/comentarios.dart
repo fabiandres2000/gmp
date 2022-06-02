@@ -71,23 +71,28 @@ class _ComentariosPageState extends State<ComentariosPage> {
                   height: _sc.getProportionateScreenHeight(10),
                 ),
                 loading == false? Expanded(
-                  child: ListView.builder(
-                    //physics: const NeverScrollableScrollPhysics(),
-                    itemCount:
-                        comentarios == null ? 0 : comentarios.length,
-                    shrinkWrap: true,
-                    itemBuilder: (BuildContext context, int index) {
-                      return VistaComentario(
-                        comentarios: comentarios,
-                        sc: _sc,
-                        size: size,
-                        index: index,
-                        mres: "si",
-                        tam: 0.75,
-                        tipo: "proyecto",
-                        idProyecto: widget.idproyect
-                      );
-                    }),
+                  child: Container(
+                    margin: EdgeInsets.only(bottom: 50),
+                    child:  ListView.builder(
+                      itemCount:
+                          comentarios == null ? 0 : comentarios.length,
+                      shrinkWrap: true,
+                      itemBuilder: (BuildContext context, int index) {
+                        return VistaComentario(
+                          comentarios: comentarios,
+                          sc: _sc,
+                          size: size,
+                          index: index,
+                          mres: "si",
+                          tam: 0.75,
+                          tipo: "proyecto",
+                          idProyecto: widget.idproyect,
+                          fecha: comentarios[index]['fecha'],
+                          hora: comentarios[index]['hora']
+                        );
+                      }
+                    ),
+                  )
                 ): ShimmerItem(),
                 SizedBox(
                   height: _sc.getProportionateScreenHeight(15),

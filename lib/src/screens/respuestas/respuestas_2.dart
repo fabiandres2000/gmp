@@ -1,13 +1,15 @@
 import 'dart:convert';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:gmp/src/screens/comentarios/componentes/vistacomentarios.dart';
+import 'package:gmp/src/screens/comentarios/componentes/vistacomentario-notificaciones.dart';
+import 'package:gmp/src/screens/detalle_contratos/detallecontratos.dart';
+import 'package:gmp/src/screens/detalle_proyectos/detalleproyectos.dart';
 import 'package:gmp/src/settings/constantes.dart';
 import 'package:gmp/src/settings/size_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
-class RespuestasPage extends StatefulWidget {
+class RespuestasNotPage extends StatefulWidget {
   final String id;
   final List respuestas;
   final String image;
@@ -15,24 +17,27 @@ class RespuestasPage extends StatefulWidget {
   final String comentario;
   final String tipo;
   final String idProyecto;
-  RespuestasPage(
-      {Key key,
-      this.id,
-      this.respuestas,
-      this.image,
-      this.name,
-      this.comentario,
-      this.tipo,
-      this.idProyecto})
-      : super(key: key);
+  final String idRespuesta;
+
+  RespuestasNotPage({ 
+    Key key,
+    this.id,
+    this.respuestas,
+    this.image,
+    this.name,
+    this.comentario,
+    this.tipo,
+    this.idProyecto,
+    this.idRespuesta
+    }):super(key: key);
 
   @override
-  _RespuestasPageState createState() => _RespuestasPageState();
+  _RespuestasNotPageState createState() => _RespuestasNotPageState();
 }
 
 TextEditingController txtenviar = new TextEditingController();
 
-class _RespuestasPageState extends State<RespuestasPage> {
+class _RespuestasNotPageState extends State<RespuestasNotPage> {
   List responses;
   SharedPreferences spreferences;
   String bd;
@@ -50,12 +55,42 @@ class _RespuestasPageState extends State<RespuestasPage> {
         elevation: 0,
         title: Text(
           "Respuestas",
-          style: TextStyle(color: Colors.blue[800]),
+          style: TextStyle(color: Colors.blue[800], fontSize: 18, fontWeight: FontWeight.bold),
         ),
         iconTheme: IconThemeData(
           color: Colors.blue[800], 
         ),
+        actions: [
+          Container(
+            padding: EdgeInsets.all(20),
+            child: GestureDetector(
+              onTap: (() => {
+                if(widget.tipo == "proyecto"){
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => DetalleProyetcosPage(
+                        idproyect: widget.idProyecto,
+                      ),
+                    ),
+                  )
+                }else{
+                  Navigator.push(
+                    context,
+                    CupertinoPageRoute(
+                      builder: (context) => DetalleContratosPage(
+                        id_con: widget.idProyecto,
+                      ),
+                    ),
+                  )
+                }
+              }),
+              child: Text("Ver "+widget.tipo, style: TextStyle(fontWeight: FontWeight.bold, color: kazul, fontSize: 16)),
+            ),
+          )
+        ],
       ),
+      
       body: Stack(
         children: <Widget>[
           Container(
@@ -147,32 +182,31 @@ class _RespuestasPageState extends State<RespuestasPage> {
                       Expanded(
                         flex: 5,
                         child: Container(
-                            margin: EdgeInsets.only(bottom: 50),
-                            child: ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount:
-                                    responses == null ? 0 : responses.length,
-                                shrinkWrap: true,
-                                itemBuilder: (BuildContext context, int index) {
-                                  return VistaComentario(
-                                    comentarios: responses,
-                                    sc: _sc,
-                                    size: size,
-                                    index: index,
-                                    mres: "no",
-                                    tam: 0.65,
-                                    tipo: "contrato",
-                                    idProyecto: widget.idProyecto,
-                                    fecha: responses[index]['fecha'],
-                                    hora: responses[index]['hora']
-                                  );
-                                })),
+                          margin: EdgeInsets.only(bottom: 70),
+                          child: ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount:
+                                responses == null ? 0 : responses.length,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              return VistaComentarioNot(
+                                comentarios: responses,
+                                sc: _sc,
+                                size: size,
+                                index: index,
+                                mres: "no",
+                                tam: 0.65,
+                                tipo: "contrato",
+                                idProyecto: widget.idProyecto,
+                                fecha: responses[index]['fecha'],
+                                hora: responses[index]['hora']
+                              );
+                            }
+                          )
+                        ),
                       )
                     ],
                   ),
-                  SizedBox(
-                    height: 40,
-                  )
                 ],
               ),
             ),
@@ -245,9 +279,9 @@ class _RespuestasPageState extends State<RespuestasPage> {
   @override
   void initState() {
     super.initState();
-    responses = new List();
+    responses = new List.empty();
     responses = widget.respuestas;
-    instanciar_sesion();
+    instanciarSesion();
   }
 
   Future<String> listarrespuesta() async {
@@ -303,7 +337,7 @@ class _RespuestasPageState extends State<RespuestasPage> {
     return "Success!";
   }
 
-  instanciar_sesion() async {
+  instanciarSesion() async {
     spreferences = await SharedPreferences.getInstance();
     bd = spreferences.getString("bd");
     empresa = spreferences.getString("empresa");

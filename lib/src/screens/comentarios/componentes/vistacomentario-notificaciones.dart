@@ -4,8 +4,8 @@ import 'package:gmp/src/screens/respuestas/respuestas.dart';
 import 'package:gmp/src/settings/constantes.dart';
 import 'package:gmp/src/settings/size_config.dart';
 
-class VistaComentario extends StatelessWidget {
-  const VistaComentario({
+class VistaComentarioNot extends StatelessWidget {
+  const VistaComentarioNot({
     Key key,
     @required this.comentarios,
     @required SizeConfig sc,
@@ -16,7 +16,7 @@ class VistaComentario extends StatelessWidget {
     @required this.tipo,
     @required this.idProyecto,
     @required this.fecha,
-    @required this.hora
+    @required this.hora,
   })  : _sc = sc,
         super(key: key);
 
@@ -79,7 +79,7 @@ class VistaComentario extends StatelessWidget {
                       SizedBox(
                         height: _sc.getProportionateScreenHeight(5),
                       ),
-                       Container(
+                      Container(
                         padding: EdgeInsets.only(right: 5),
                         child: Row(
                           crossAxisAlignment: CrossAxisAlignment.end,
@@ -95,80 +95,8 @@ class VistaComentario extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: _sc.getProportionateScreenHeight(5),
+                height: 5,
               ),
-              mres == "si"
-                  ? GestureDetector(
-                      onTap: () {
-                        var imagen;
-                        if (comentarios[index]['imagen'] == "noimage") {
-                          imagen =
-                              '${URL_SERVER}/images/foto/${comentarios[index]['imagen']}.png';
-                        } else {
-                          imagen =
-                              '${URL_SERVER}/images/foto/${comentarios[index]['imagen']}';
-                        }
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                            builder: (context) => RespuestasPage(
-                                id: comentarios[index]['id'].toString(),
-                                respuestas: comentarios[index]['respuestas'],
-                                name: comentarios[index]['nombre'],
-                                comentario: comentarios[index]['comentario'],
-                                image: imagen,
-                                tipo: tipo,
-                                idProyecto: idProyecto),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: size.width * 0.65,
-                        child: Row(children: [
-                          Text(
-                            "Respuestas (${comentarios[index]['response']})",
-                            style: TextStyle(
-                                fontSize: _sc.getProportionateScreenHeight(14)),
-                          ),
-                          Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              var imagen;
-                              if (comentarios[index]['imagen'] == "noimage") {
-                                imagen =
-                                    '${URL_SERVER}/images/foto/${comentarios[index]['imagen']}.png';
-                              } else {
-                                imagen =
-                                    '${URL_SERVER}/images/foto/${comentarios[index]['imagen']}';
-                              }
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => RespuestasPage(
-                                      id: comentarios[index]['id'].toString(),
-                                      respuestas: comentarios[index]
-                                          ['respuestas'],
-                                      name: comentarios[index]['nombre'],
-                                      comentario: comentarios[index]
-                                          ['comentario'],
-                                      image: imagen,
-                                      tipo: tipo),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              "Responder",
-                              style: TextStyle(
-                                  fontSize:
-                                      _sc.getProportionateScreenHeight(14),
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.grey[700]),
-                            ),
-                          )
-                        ]),
-                      ),
-                    )
-                  : Container(),
             ],
           ),
         ],

@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:gmp/src/providers/push_notification_provider.dart';
-import 'package:gmp/src/screens/detalle_contratos/detallecontratos.dart';
-import 'package:gmp/src/screens/detalle_proyectos/detalleproyectos.dart';
 import 'package:gmp/src/screens/notificaciones/shimmer.dart';
+import 'package:gmp/src/screens/respuestas/respuestas_2.dart';
 import 'package:gmp/src/settings/constantes.dart';
 import 'package:gmp/src/settings/size_config.dart';
 import 'package:motion_toast/motion_toast.dart';
@@ -106,9 +105,9 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                             ),
                             onTap: (){
                               if(notificacionesLista[index]['tipo_respuesta_comentario'] == 1){
-                                verProyecto(notificacionesLista[index]['detalle'][0]['id_proyect'], notificacionesLista[index]['bd'], notificacionesLista[index]['id']);
+                                verProyecto(notificacionesLista[index]);
                               }else{
-                                verContrato(notificacionesLista[index]['detalle'][0]['id_contrato'].toString(), notificacionesLista[index]['bd'], notificacionesLista[index]['id']);
+                                verContrato(notificacionesLista[index]);
                               }
                             },
                           ); 
@@ -170,9 +169,9 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                             ),
                             onTap: (){
                               if(notificacionesLista[index]['tipo_respuesta_comentario'] == 1){
-                                verProyecto(notificacionesLista[index]['detalle'][0]['id_proyect'], notificacionesLista[index]['bd'], notificacionesListaNoLeidas[index]['id']);
+                                verProyecto(notificacionesLista[index]);
                               }else{
-                                verContrato(notificacionesLista[index]['detalle'][0]['id_contrato'].toString(), notificacionesLista[index]['bd'], notificacionesListaNoLeidas[index]['id']);
+                                verContrato(notificacionesLista[index]);
                               }
                             },
                           );
@@ -270,28 +269,85 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
     return listaf;
   }
 
-  verProyecto(int idP, String bd, int idNot) async {
-    await cambiarEstado(idNot);
+  verProyecto(var coment) async {
+    await cambiarEstado(coment['id']);
     spreferences = await SharedPreferences.getInstance();
-    spreferences.setString("bd",bd);
-    spreferences.setString("empresa", bd.split("_")[1]);
-     Navigator.push(
-      this.context,
-      CupertinoPageRoute(
-          builder: (context) => DetalleProyetcosPage(idproyect: idP.toString())),
-    );
-  }
+    spreferences.setString("bd", coment['bd']);
+    spreferences.setString("empresa", coment['bd'].split("_")[1]);
 
-  verContrato(String idCon,  String bd, int idNot) async {
-    await cambiarEstado(idNot);
-    spreferences = await SharedPreferences.getInstance();
-    spreferences.setString("bd",bd);
-    spreferences.setString("empresa", bd.split("_")[1]);
+    var bd = coment['bd'];
+    var id = coment['id_comentario'].toString();
+
+    var response = await http.get(Uri.parse('${URL_SERVER}comentario_proyectos?bd=${bd}&id=${id}'),headers: {"Accept": "application/json"});
+
+    final reponsebody = json.decode(response.body);
+
+    var comentario = reponsebody["comentario"][0];
+
+    var imagen;
+    if (comentario['imagen'] == "noimage") {
+      imagen =
+          '${URL_SERVER}/images/foto/${comentario['imagen']}.png';
+    } else {
+      imagen =
+          '${URL_SERVER}/images/foto/${comentario['imagen']}';
+    }
+
     Navigator.push(
       context,
       CupertinoPageRoute(
-          builder: (context) => DetalleContratosPage(id_con: idCon)),
+        builder: (context) => RespuestasNotPage(
+          id: comentario['id'].toString(),
+          respuestas: comentario['respuestas'],
+          name: comentario['nombre'],
+          comentario: comentario['comentario'],
+          image: imagen,
+          tipo: "proyecto",
+          idProyecto: coment['detalle'][0]['id_proyect'].toString()
+        ),
+      ),
     );
+  }
+
+  verContrato(var coment) async {
+    await cambiarEstado(coment['id']);
+    spreferences = await SharedPreferences.getInstance();
+    spreferences.setString("bd", coment['bd']);
+    spreferences.setString("empresa", coment['bd'].split("_")[1]);
+
+    var bd = coment['bd'];
+    var id = coment['id_comentario'].toString();
+
+    var response = await http.get(Uri.parse('${URL_SERVER}comentario_contratos?bd=${bd}&id=${id}'),headers: {"Accept": "application/json"});
+
+    final reponsebody = json.decode(response.body);
+
+    var comentario = reponsebody["comentario"][0];
+
+    var imagen;
+    if (comentario['imagen'] == "noimage") {
+      imagen =
+          '${URL_SERVER}/images/foto/${comentario['imagen']}.png';
+    } else {
+      imagen =
+          '${URL_SERVER}/images/foto/${comentario['imagen']}';
+    }
+
+    Navigator.push(
+      context,
+      CupertinoPageRoute(
+        builder: (context) => RespuestasNotPage(
+          id: comentario['id'].toString(),
+          respuestas: comentario['respuestas'],
+          name: comentario['nombre'],
+          comentario: comentario['comentario'],
+          image: imagen,
+          tipo: "contrato",
+          idProyecto: coment['detalle'][0]['id_contrato'].toString()
+        ),
+      ),
+    );
+
   }
 
   cambiarEstado(int idNot) async {
