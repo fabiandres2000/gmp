@@ -952,21 +952,12 @@ Route::get('/registrar', function () {
 	$edad = obtener_edad_segun_fecha($data['fecha']);
 	
 	if($edad < 18){
-		$countexiste = "99";
+		$countexiste = 99;
 	}else{
 	
 	$countexiste = count($existe);
 	if($countexiste == 0){
 		$usuario = \App\users::guardar($data);
-		                 /*$parametros = array(
-                        'token' => $usuario->token_registro,
-                        'id' => $usuario->id,
-                    );
-		$correo = $data['email'];
-                    Mail::send("correo", $parametros, function($message) use($correo) {
-                        $message->from("no-reply@leeringenieria.com", "Confrimación de correo");
-                        $message->to($correo)->subject("Confrimación de correo");
-                    });*/
 	}
 	}
      return response()->json([
