@@ -1,12 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:math';
-import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gmp/src/settings/constantes.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:gmp/src/settings/size_config.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../settings/constantes.dart';
 import 'package:motion_toast/motion_toast.dart';
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
@@ -268,7 +267,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
                               //side: BorderSide(color: Colors.red)
                             ),
                             onPressed: () {
-                              _guardar(context);
+                              loginUserPassword(context);
                             },
                             child: Text(
                               "Guardar",
@@ -322,6 +321,25 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
     }
   }
 
+  loginUserPassword(BuildContext context) async {
+    var pemail = emailcontroller.text;
+    var pcontra = passcontroller.text;
+    try {
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: pemail,
+        password: pcontra,
+      );
+      _guardar(context);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        _mensaje(Colors.red,"La contraseña proporcionada es demasiado débil.", context);
+      } else if (e.code == 'email-already-in-use') {
+        _mensaje(Colors.red,"La cuenta ya existe para ese correo electrónico.", context);
+      }
+    } catch (e) {
+      print(e);
+    }
+  }
 
   _guardar (BuildContext context) async {
 
@@ -350,6 +368,7 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
           _mensaje(Colors.orange,"Ya existe un usuario con ese email.", context);
           break;
         case 0:
+          await _guardarPreferencias(pemail);
           _mensaje(Colors.green,"Usuario registrado correctamente", context);
           break;
       }
@@ -383,5 +402,21 @@ class _RegistroUsuarioState extends State<RegistroUsuario> {
       return false;
     }
     return true;
+  }
+
+  _guardarPreferencias(String email) async {
+    var spreferences = await SharedPreferences.getInstance();
+      var response = await http.get(Uri.parse('${URL_SERVER}usuario?email=$email&id='),headers: {"Accept": "application/json"});
+
+      final reponsebody = json.decode(response.body);
+
+      spreferences.setString("email", reponsebody['usuario']['email']);
+      spreferences.setString("nombre", reponsebody['usuario']['nombre']);
+      spreferences.setString("bio", reponsebody['usuario']['bio'] ?? '');
+      spreferences.setString("alias", reponsebody['alias'] ?? '');
+      spreferences.setBool("notificaciones", true);
+      spreferences.setString("id", reponsebody['usuario']['id'].toString());
+      spreferences.setString("id_usu", reponsebody['usuario']['id'].toString());
+      spreferences.setString("imagen", reponsebody['usuario']['imagen']);
   }
 }

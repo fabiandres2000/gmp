@@ -795,9 +795,10 @@ Route::get('/comentario/guardar', function () {
                 ->where("id",$data['id_usu'])
                 ->first();
         
-        //guardar_notificacion($usuarios['id_usu'], $data['response'], 2, $value, $usuario['nombre']." respondió un comentario tuyo,", $usuario['id']);
-        enviar_mensaje($keytoken,$usuario['nombre']." respondió un comentario tuyo.","respuesta a contrato");
-        
+        if($usuarios['id_usu'] !=  $usuario['id']){
+            guardar_notificacion($usuarios['id_usu'], $data['response'], 2, $value, $usuario['nombre']." respondió un comentario tuyo,", $usuario['id']);
+            enviar_mensaje($keytoken,$usuario['nombre']." respondió un comentario tuyo.","respuesta a contrato");
+        }
     }
 
      return response()->json([
@@ -923,9 +924,10 @@ Route::get('/comentario_proyectos/guardar', function () {
 				->where("id",$data['id_usu'])
 				->first();
         
-        guardar_notificacion($usuarios['id_usu'], $data['response'], 1, $value, $usuario['nombre']." respondió un comentario tuyo,", $usuario['id']);
-		enviar_mensaje($keytoken,$usuario['nombre']." respondió un comentario tuyo.",$data['id_con']);
-		
+        if($usuarios['id_usu'] !=  $usuario['id']){
+            guardar_notificacion($usuarios['id_usu'], $data['response'], 1, $value, $usuario['nombre']." respondió un comentario tuyo,", $usuario['id']);
+		    enviar_mensaje($keytoken,$usuario['nombre']." respondió un comentario tuyo.",$data['id_con']);
+        }
 	}
 
      return response()->json([
@@ -2294,5 +2296,23 @@ Route::get('/comentario_contratos', function () {
 
      return response()->json([
 		 		'comentario' => $comentarios
+    ]);
+});
+
+
+Route::get('/usuario', function () {
+    header("Access-Control-Allow-Origin: *");
+    $id = request()->get("id");
+    $value = "bd_gmp2";
+	$countexiste=0;
+	$data = request()->all();
+
+    $usuario = DB::connection("mysql")->table($value . ".users")
+            ->select($value.".users.*")
+			->where($value.".users.email",$data['email'])
+            ->first();
+    
+     return response()->json([
+                'usuario' => $usuario,
     ]);
 });

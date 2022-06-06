@@ -168,10 +168,10 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                               ) 
                             ),
                             onTap: (){
-                              if(notificacionesLista[index]['tipo_respuesta_comentario'] == 1){
-                                verProyecto(notificacionesLista[index]);
+                              if(notificacionesListaNoLeidas[index]['tipo_respuesta_comentario'] == 1){
+                                verProyecto(notificacionesListaNoLeidas[index]);
                               }else{
-                                verContrato(notificacionesLista[index]);
+                                verContrato(notificacionesListaNoLeidas[index]);
                               }
                             },
                           );

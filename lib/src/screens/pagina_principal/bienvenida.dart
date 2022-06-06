@@ -107,19 +107,22 @@ class _BienvenidaPageState extends State<BienvenidaPage> {
     );
   }
 
-  void onTabTapped(int index) {
+  void onTabTapped(int index) async {
+    await consultarNotificaciones();
     setState(() {
       not = false;
       _currentIndex = index;
     });
   }
 
-  void onTabTapped2() {
+  void onTabTapped2() async {
     if(not == false){
+      await consultarNotificaciones();
       setState(() {
         not = true;
       });
     }else{
+      await consultarNotificaciones();
       setState(() {
         not = false;
       });
