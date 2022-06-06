@@ -62,7 +62,6 @@ class _PerfilPageState extends State<PerfilPage> {
                     onTap: () {
                       _showSelectionDialog(context);
                     },
-
                     child: Stack(
                       children: [
                         Container(
