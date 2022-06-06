@@ -62,21 +62,42 @@ class _PerfilPageState extends State<PerfilPage> {
                     onTap: () {
                       _showSelectionDialog(context);
                     },
-                    child: Container(
-                      width: size.width * 0.4,
-                      height: size.width * 0.4,
-                      decoration: BoxDecoration(
-                        color: kazul,
-                        borderRadius: BorderRadius.circular(1000),
-                       
-                      ),
-                      child: loading == true? ClipRRect(
-                        borderRadius: BorderRadius.circular(1000),
-                        child:  _cr,
-                      ): Center(
-                        child: CircularProgressIndicator( color:  Colors.white),
-                      ) ,
-                    ),
+
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: size.width * 0.4,
+                          height: size.width * 0.4,
+                          decoration: BoxDecoration(
+                            color: kazul,
+                            borderRadius: BorderRadius.circular(1000),
+                          
+                          ),
+                          child: loading == true? 
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(1000),
+                              child:  _cr,
+                            ) : Center(
+                            child: CircularProgressIndicator( color:  Colors.white),
+                            ) ,
+                        ),
+                        Positioned(
+                            bottom: 0,
+                            right: 10,
+                            child: Container(
+                              child: Icon(Icons.camera_alt, color: Colors.white),
+                              alignment: Alignment.center,
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                border: Border.all(width: 4, color: Colors.white),
+                                color: kazul,
+                                shape: BoxShape.circle
+                              ),
+                            ),
+                          )
+                      ],
+                    ) 
                   ),
                   SizedBox(
                     height: defaultpadding - 10,
