@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:gmp/src/screens/comentarios/componentes/vistacomentarios.dart';
@@ -6,6 +7,7 @@ import 'package:gmp/src/settings/constantes.dart';
 import 'package:gmp/src/settings/size_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 class RespuestasPage extends StatefulWidget {
   final String id;
@@ -39,6 +41,8 @@ class _RespuestasPageState extends State<RespuestasPage> {
   String empresa;
   int isloading = 0;
   String id_user;
+
+  bool emojiShowing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -178,17 +182,72 @@ class _RespuestasPageState extends State<RespuestasPage> {
             ),
           ),
           Positioned(
+            bottom: 80,
+            left: 0,
+            width: size.width,
+            child: Offstage(
+              offstage: !emojiShowing,
+              child: SizedBox(
+                height: 250,
+                child: EmojiPicker(
+                    onEmojiSelected: (Category category, Emoji emoji) {
+                      _onEmojiSelected(emoji);
+                    },
+                    onBackspacePressed: _onBackspacePressed,
+                    config: Config(
+                        columns: 7,
+                        emojiSizeMax: 32 * (Platform.isIOS ? 1.30 : 1.0),
+                        verticalSpacing: 0,
+                        horizontalSpacing: 0,
+                        initCategory: Category.RECENT,
+                        bgColor: const Color(0xFFF2F2F2),
+                        indicatorColor: Colors.blue,
+                        iconColor: Colors.grey,
+                        iconColorSelected: Colors.blue,
+                        progressIndicatorColor: Colors.blue,
+                        backspaceColor: Colors.blue,
+                        skinToneDialogBgColor: Colors.white,
+                        skinToneIndicatorColor: Colors.grey,
+                        enableSkinTones: true,
+                        showRecentsTab: true,
+                        recentsLimit: 28,
+                        noRecents: const Text(
+                          'No Recents',
+                          style: TextStyle(fontSize: 20, color: Colors.black26),
+                          textAlign: TextAlign.center,
+                        ),
+                        tabIndicatorAnimDuration: kTabScrollDuration,
+                        categoryIcons: const CategoryIcons(),
+                        buttonMode: ButtonMode.MATERIAL)),
+              ),
+            )
+          ),
+          Positioned(
             bottom: 0,
             left: 0,
             width: size.width,
             child: Container(
-              decoration: BoxDecoration(color: Colors.white, border: Border()),
+              decoration: BoxDecoration(color: kazul, border: Border()),
               child: Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Row(
                   children: [
+                    Material(
+                      color: kazul,
+                      child: IconButton(
+                        onPressed: () {
+                          setState(() {
+                            emojiShowing = !emojiShowing;
+                          });
+                        },
+                        icon: const Icon(
+                          Icons.emoji_emotions,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                     Container(
-                      width: size.width * 0.8,
+                      width: size.width * 0.68,
                       decoration: BoxDecoration(
                         color: Colors.grey[300],
                         borderRadius: BorderRadius.circular(15),
@@ -196,6 +255,13 @@ class _RespuestasPageState extends State<RespuestasPage> {
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         child: TextFormField(
+                          onTap: (() {
+                            setState(() {
+                              if(emojiShowing == true){
+                                emojiShowing = false;
+                              }
+                            });
+                          }),
                           controller: txtenviar,
                           decoration: InputDecoration(
                               border: InputBorder.none,
@@ -219,7 +285,7 @@ class _RespuestasPageState extends State<RespuestasPage> {
                                   child: Container(
                                     decoration: BoxDecoration(),
                                     child: Icon(Icons.send,
-                                        color: Colors.blue[700]),
+                                        color: Colors.white),
                                   ),
                                 ),
                               ),
@@ -227,7 +293,7 @@ class _RespuestasPageState extends State<RespuestasPage> {
                           : Center(
                               child: CircularProgressIndicator(
                                 valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.blue[900]),
+                                    Colors.white),
                                 strokeWidth: 3,
                               ),
                             ),
@@ -247,7 +313,7 @@ class _RespuestasPageState extends State<RespuestasPage> {
     super.initState();
     responses = new List();
     responses = widget.respuestas;
-    instanciar_sesion();
+    instanciarSesion();
   }
 
   Future<String> listarrespuesta() async {
@@ -303,10 +369,22 @@ class _RespuestasPageState extends State<RespuestasPage> {
     return "Success!";
   }
 
-  instanciar_sesion() async {
+  instanciarSesion() async {
     spreferences = await SharedPreferences.getInstance();
     bd = spreferences.getString("bd");
     empresa = spreferences.getString("empresa");
     id_user = spreferences.getString("id");
+  } _onEmojiSelected(Emoji emoji) {
+    txtenviar
+      ..text += emoji.emoji
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: txtenviar.text.length));
+  }
+
+  _onBackspacePressed() {
+    txtenviar
+      ..text = txtenviar.text.characters.skipLast(1).toString()
+      ..selection = TextSelection.fromPosition(
+          TextPosition(offset: txtenviar.text.length));
   }
 }
