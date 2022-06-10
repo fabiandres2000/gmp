@@ -729,14 +729,14 @@ Route::get('/comentarios', function () {
 		->where("id_con",request()->get("id_con"))
 		->where("response","0")
 		->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
-		->select($value.".comentarios.*","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+		->select($value.".comentarios.*","bd_gmp2.users.nombre","bd_gmp2.users.imagen","bd_gmp2.users.id as id_usu")
 		->selectRaw("'false' as expandir")
 		->get();
 	
 	foreach($comentarios as $comentario){
 		$respuestas = DB::connection("mysql")->table($value.".comentarios")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
-			->select($value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios.id as id_comentario", $value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
 			->where($value.".comentarios.response",$comentario->id)
 			->get();
                 
@@ -819,7 +819,7 @@ Route::get('/comentarios_proyectos', function () {
 		->where("id_con",request()->get("id_con"))
 		->where("response","0")
 		->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
-		->select($value.".comentarios_proyectos.*","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+		->select($value.".comentarios_proyectos.*","bd_gmp2.users.nombre","bd_gmp2.users.imagen","bd_gmp2.users.id as id_usu")
 		->selectRaw("'false' as expandir")
 		->orderBy("id","desc")
 		->get();
@@ -827,7 +827,7 @@ Route::get('/comentarios_proyectos', function () {
 	foreach($comentarios as $comentario){
 		$respuestas = DB::connection("mysql")->table($value.".comentarios_proyectos")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
-			->select($value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios_proyectos.id as id_comentario", $value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
 			->where($value.".comentarios_proyectos.response",$comentario->id)
 			->get();
                 
@@ -854,7 +854,7 @@ Route::get('/comentarios_proyectos_respuestas', function () {
 	
 	$respuestas = DB::connection("mysql")->table($value.".comentarios_proyectos")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios_proyectos.id_usu")
-			->select($value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios_proyectos.id as id_comentario", $value.".comentarios_proyectos.comentario",$value.".comentarios_proyectos.fecha",$value.".comentarios_proyectos.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen","bd_gmp2.users.id as id_usu")
 			->where($value.".comentarios_proyectos.response",$id)
 			->orderBy("comentarios_proyectos.id","asc")
 			->get();
@@ -872,7 +872,7 @@ Route::get('/comentarios_respuestas', function () {
 	
 	$respuestas = DB::connection("mysql")->table($value.".comentarios")
 			->join("bd_gmp2.users","bd_gmp2.users.id",$value.".comentarios.id_usu")
-			->select($value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen")
+			->select($value.".comentarios.id as id_comentario", $value.".comentarios.comentario",$value.".comentarios.fecha",$value.".comentarios.hora","bd_gmp2.users.nombre","bd_gmp2.users.imagen","bd_gmp2.users.id as id_usu")
 			->where($value.".comentarios.response",$id)
 			->orderBy("comentarios.id","asc")
 			->get();
@@ -2314,5 +2314,26 @@ Route::get('/usuario', function () {
     
      return response()->json([
                 'usuario' => $usuario,
+    ]);
+});
+
+Route::get('/eliminar-comentario', function () {
+    header("Access-Control-Allow-Origin: *");
+    $value = request()->get("bd");
+    $tipo = request()->get("tipo");
+	$data = request()->all();
+
+    if($tipo == "proyecto"){
+        $respuesta = DB::connection("mysql")->table($value.".comentarios_proyectos")
+        ->where("id",request()->get("id_com"))
+        ->delete();
+    }else{
+        $respuesta = DB::connection("mysql")->table($value.".comentarios")
+        ->where("id",request()->get("id_com"))
+        ->delete();
+    }
+
+     return response()->json([
+                'respuesta' => $respuesta,
     ]);
 });

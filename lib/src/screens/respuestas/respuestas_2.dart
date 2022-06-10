@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:gmp/src/screens/comentarios/componentes/vistacomentario-notificaciones.dart';
 import 'package:gmp/src/screens/detalle_contratos/detallecontratos.dart';
 import 'package:gmp/src/screens/detalle_proyectos/detalleproyectos.dart';
+import 'package:gmp/src/screens/notificaciones/shimmer_item.dart';
 import 'package:gmp/src/settings/constantes.dart';
 import 'package:gmp/src/settings/size_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
 
 class RespuestasNotPage extends StatefulWidget {
   final String id;
@@ -47,6 +49,7 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
   int isloading = 0;
   String id_user;
 
+  bool loading = false;
   bool emojiShowing = false;
 
   @override
@@ -183,7 +186,7 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
                           decoration: BoxDecoration(),
                         ),
                       ),
-                      Expanded(
+                      loading == false? Expanded(
                         flex: 5,
                         child: Container(
                           margin: EdgeInsets.only(bottom: 70),
@@ -193,22 +196,35 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
                                 responses == null ? 0 : responses.length,
                             shrinkWrap: true,
                             itemBuilder: (BuildContext context, int index) {
-                              return VistaComentarioNot(
-                                comentarios: responses,
-                                sc: _sc,
-                                size: size,
-                                index: index,
-                                mres: "no",
-                                tam: 0.65,
-                                tipo: "contrato",
-                                idProyecto: widget.idProyecto,
-                                fecha: responses[index]['fecha'],
-                                hora: responses[index]['hora']
+                              bool longPress = false;
+                              if(int.parse(id_user) == responses[index]['id_usu']){
+                                  longPress = true;
+                              }
+                              return GestureDetector(
+                                onLongPress: longPress? (() {
+                                  setState(() {
+                                    mostrarcaja(context, responses[index]['id_comentario']);
+                                  });
+                                }) : (() {
+                                  print("no----------");
+                                }),
+                                child: VistaComentarioNot(
+                                  comentarios: responses,
+                                  sc: _sc,
+                                  size: size,
+                                  index: index,
+                                  mres: "no",
+                                  tam: 0.65,
+                                  tipo: "contrato",
+                                  idProyecto: widget.idProyecto,
+                                  fecha: responses[index]['fecha'],
+                                  hora: responses[index]['hora'],
+                                ),
                               );
                             }
                           )
                         ),
-                      )
+                      ) : ShimmerItem(),
                     ],
                   ),
                 ],
@@ -346,11 +362,13 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
   void initState() {
     super.initState();
     responses = new List.empty();
-    responses = widget.respuestas;
     instanciarSesion();
   }
 
   Future<String> listarrespuesta() async {
+    setState(() {
+      loading = true;
+    });
     if (widget.tipo == "proyecto") {
       var response = await http.get(
           Uri.parse(
@@ -359,6 +377,7 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
       final reponsebody = json.decode(response.body);
       this.setState(() {
         responses = reponsebody['respuestas'];
+        loading = false;
       });
     } else {
       var response = await http.get(
@@ -368,6 +387,7 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
       final reponsebody = json.decode(response.body);
       this.setState(() {
         responses = reponsebody['respuestas'];
+        loading = false;
       });
     }
 
@@ -408,6 +428,7 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
     bd = spreferences.getString("bd");
     empresa = spreferences.getString("empresa");
     id_user = spreferences.getString("id");
+    await listarrespuesta();
   }
 
   _onEmojiSelected(Emoji emoji) {
@@ -423,4 +444,86 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
       ..selection = TextSelection.fromPosition(
           TextPosition(offset: txtenviar.text.length));
   }
+
+  mostrarcaja(BuildContext context, int idComentario) {
+    return showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        isScrollControlled: true,
+        builder: (_) {
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))
+            ),
+            height: 170,
+            padding: EdgeInsets.only(top: 10, left: 20, right: 20),
+            child: Column(
+              children: [
+                Center(
+                  child: Text("¿Que desea hacer?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+                ),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: (() {
+                    Navigator.pop(context);
+                    mensajeEliminar(idComentario);
+                  }),
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_forever, size: 30),
+                      SizedBox(width: 10),
+                      Text("Eliminar el comentario", style: TextStyle(fontSize: 20))
+                    ],
+                  )
+                ),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Icon(Icons.edit, size: 30),
+                    SizedBox(width: 10),
+                    Text("Editar el comentario", style: TextStyle(fontSize: 20))
+                  ],
+                )
+              ],
+            ),
+          );
+        }).whenComplete(() {
+      print('Hey there, I\'m calling after hide bottomSheet');
+    });
+  }
+
+  mensajeEliminar(int idComentario){
+   AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      headerAnimationLoop: false,
+      animType: AnimType.TOPSLIDE,
+      showCloseIcon: true,
+      closeIcon: const Icon(Icons.close_fullscreen_outlined),
+      btnCancelText: 'Cancelar',
+      btnOkText: 'Eliminar',
+      btnCancelColor: Colors.red,
+      btnOkColor: kazul,
+      desc:'¿Seguro que quieres eliminar este comentario?',
+      btnCancelOnPress: () {
+       
+      },
+      onDissmissCallback: (type) {
+        debugPrint('Dialog Dissmiss from callback $type');
+      },
+      btnOkOnPress: () {
+       eliminarComentario(idComentario);
+      },
+    ).show();
+  }
+
+  eliminarComentario(int idComentario) async {
+    setState(() {
+      loading = true;
+    });
+    await http.get(Uri.parse('${URL_SERVER}eliminar-comentario?bd=${bd}&id_com=${idComentario}&tipo=${widget.tipo}'),headers: {"Accept": "application/json"}); 
+    listarrespuesta();
+  }
+
 }

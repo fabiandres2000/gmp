@@ -85,8 +85,8 @@ class VistaComentarioNot extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.end,
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
-                            Text(calcularFechas(fecha)+"A las ", style: TextStyle(fontStyle: FontStyle.italic)),
-                            Text(hora, style: TextStyle(fontStyle: FontStyle.italic))
+                            Text(calcularFechas(fecha)+"A las ", style: TextStyle(fontStyle: FontStyle.italic, fontSize: _sc.getProportionateScreenHeight(10))),
+                            Text(hora, style: TextStyle(fontStyle: FontStyle.italic, fontSize: _sc.getProportionateScreenHeight(10)))
                           ],
                         ),
                       ),

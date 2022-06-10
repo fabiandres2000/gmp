@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:gmp/src/screens/notificaciones/shimmer_item.dart';
 import 'package:gmp/src/settings/constantes.dart';
@@ -81,17 +82,28 @@ class _ComentariosPageState extends State<ComentariosPage> {
                           comentarios == null ? 0 : comentarios.length,
                       shrinkWrap: true,
                       itemBuilder: (BuildContext context, int index) {
-                        return VistaComentario(
-                          comentarios: comentarios,
-                          sc: _sc,
-                          size: size,
-                          index: index,
-                          mres: "si",
-                          tam: 0.75,
-                          tipo: "proyecto",
-                          idProyecto: widget.idproyect,
-                          fecha: comentarios[index]['fecha'],
-                          hora: comentarios[index]['hora']
+                        bool longPress = false;
+                        if(int.parse(id_user) == comentarios[index]['id_usu']){
+                            longPress = true;
+                        }
+                        return GestureDetector(
+                          onLongPress: longPress ? (() {
+                            mostrarcaja(context, comentarios[index]['id']);
+                          }): (() {
+                            print("no-------");
+                          }),
+                          child: VistaComentario(
+                            comentarios: comentarios,
+                            sc: _sc,
+                            size: size,
+                            index: index,
+                            mres: "si",
+                            tam: 0.75,
+                            tipo: "proyecto",
+                            idProyecto: widget.idproyect,
+                            fecha: comentarios[index]['fecha'],
+                            hora: comentarios[index]['hora']
+                          )
                         );
                       }
                     ),
@@ -285,5 +297,88 @@ class _ComentariosPageState extends State<ComentariosPage> {
       ..text = txtenviar.text.characters.skipLast(1).toString()
       ..selection = TextSelection.fromPosition(
           TextPosition(offset: txtenviar.text.length));
+  }
+
+  mostrarcaja(BuildContext context, int idComentario) {
+    return showModalBottomSheet(
+        backgroundColor: Colors.transparent,
+        context: context,
+        isScrollControlled: true,
+        builder: (_) {
+          return Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))
+            ),
+            height: 170,
+            padding: EdgeInsets.only(top: 10, left: 20, right: 20),
+            child: Column(
+              children: [
+                Center(
+                  child: Text("¿Que desea hacer?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 25)),
+                ),
+                SizedBox(height: 20),
+                GestureDetector(
+                  onTap: (() {
+                    Navigator.pop(context);
+                    mensajeEliminar(idComentario);
+                  }),
+                  child: Row(
+                    children: [
+                      Icon(Icons.delete_forever, size: 30),
+                      SizedBox(width: 10),
+                      Text("Eliminar el comentario", style: TextStyle(fontSize: 20))
+                    ],
+                  ),
+                )
+                ,
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Icon(Icons.edit, size: 30),
+                    SizedBox(width: 10),
+                    Text("Editar el comentario", style: TextStyle(fontSize: 20))
+                  ],
+                )
+              ],
+            ),
+          );
+        }).whenComplete(() {
+      print('Hey there, I\'m calling after hide bottomSheet');
+    });
+  }
+
+  mensajeEliminar(int idComentario){
+   AwesomeDialog(
+      context: context,
+      dialogType: DialogType.WARNING,
+      headerAnimationLoop: false,
+      animType: AnimType.TOPSLIDE,
+      showCloseIcon: true,
+      closeIcon: const Icon(Icons.close_fullscreen_outlined),
+      btnCancelText: 'Cancelar',
+      btnOkText: 'Eliminar',
+      btnCancelColor: Colors.red,
+      btnOkColor: kazul,
+      desc:'¿Seguro que quieres eliminar este comentario?',
+      btnCancelOnPress: () {
+       
+      },
+      onDissmissCallback: (type) {
+        debugPrint('Dialog Dissmiss from callback $type');
+      },
+      btnOkOnPress: () {
+       eliminarComentario(idComentario);
+      },
+    ).show();
+  }
+
+  eliminarComentario(int idComentario) async {
+    setState(() {
+      loading = true;
+    });
+    String tipo = "proyecto";
+    await http.get(Uri.parse('${URL_SERVER}eliminar-comentario?bd=${bd}&id_com=${idComentario}&tipo=${tipo}'),headers: {"Accept": "application/json"}); 
+    listarcomentarios();
   }
 }
