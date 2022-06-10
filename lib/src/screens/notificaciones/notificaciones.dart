@@ -249,8 +249,8 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
 
     var reponsebody = json.decode(response.body);
     var nt = reponsebody['notificaciones'];
+    nt = await limpiarEliminadas(nt);
     var ntl = await filtrarLeidas(nt);
-
     setState(() {
       notificacionesLista = nt;
       notificacionesListaNoLeidas = ntl;
@@ -356,5 +356,15 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
     setState(() {
       consultarNotificaciones();
     });
+  }
+
+  limpiarEliminadas(List lista) async {
+    var listaf = [];
+    for (var item in lista) {
+      if(item["detalle"].length >  0){
+        listaf.add(item);
+      }
+    }
+    return listaf;
   }
 }

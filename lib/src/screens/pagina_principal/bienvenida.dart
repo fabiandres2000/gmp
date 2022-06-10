@@ -169,6 +169,7 @@ class _BienvenidaPageState extends State<BienvenidaPage> {
     var reponsebody = json.decode(response.body);
 
     List notificaciones = reponsebody['notificaciones'];
+    notificaciones = await limpiarEliminadas(notificaciones);
     var ntl = await filtrarLeidas(notificaciones);
 
     setState(() {
@@ -184,6 +185,16 @@ class _BienvenidaPageState extends State<BienvenidaPage> {
     var listaf = [];
     for (var item in lista) {
       if(item["estado"] == 1){
+        listaf.add(item);
+      }
+    }
+    return listaf;
+  }
+
+   limpiarEliminadas(List lista) async {
+    var listaf = [];
+    for (var item in lista) {
+      if(item["detalle"].length >  0){
         listaf.add(item);
       }
     }
