@@ -20,6 +20,7 @@ class ComentariosContratosPage extends StatefulWidget {
 }
 
 TextEditingController txtenviar = new TextEditingController();
+TextEditingController txtenditar = new TextEditingController();
 
 class _ComentariosContratosPageState extends State<ComentariosContratosPage> {
 SharedPreferences spreferences;
@@ -86,7 +87,7 @@ SharedPreferences spreferences;
                         }
                         return GestureDetector(
                           onLongPress: longPress ? (() {
-                            mostrarcaja(context, comentarios[index]['id']);
+                             mostrarcaja(context, comentarios[index]['id'], comentarios[index]['comentario'], comentarios[index]['imagen']);
                           }): (() {
                             print("no-------");
                           }),
@@ -295,7 +296,7 @@ SharedPreferences spreferences;
           TextPosition(offset: txtenviar.text.length));
   }
 
-  mostrarcaja(BuildContext context, int idComentario) {
+  mostrarcaja(BuildContext context, int idComentario, String comentario, String imagen) {
     return showModalBottomSheet(
         backgroundColor: Colors.transparent,
         context: context,
@@ -328,12 +329,18 @@ SharedPreferences spreferences;
                   )
                 ),
                 SizedBox(height: 20),
-                Row(
-                  children: [
-                    Icon(Icons.edit, size: 30),
-                    SizedBox(width: 10),
-                    Text("Editar el comentario", style: TextStyle(fontSize: 20))
-                  ],
+                GestureDetector(
+                  onTap: (() {
+                    Navigator.pop(context);
+                    cajaEditar(context, idComentario, comentario, imagen);
+                  }),
+                  child: Row(
+                    children: [
+                      Icon(Icons.edit, size: 30),
+                      SizedBox(width: 10),
+                      Text("Editar el comentario", style: TextStyle(fontSize: 20))
+                    ],
+                  ),
                 )
               ],
             ),
@@ -374,6 +381,115 @@ SharedPreferences spreferences;
     });
     String tipo = "contrato";
     await http.get(Uri.parse('${URL_SERVER}eliminar-comentario?bd=${bd}&id_com=${idComentario}&tipo=${tipo}'),headers: {"Accept": "application/json"}); 
+    listarcomentarios();
+  }
+
+   cajaEditar(BuildContext context, int idComentario, String comentario, String imagen) {
+    setState(() {
+      txtenditar.text = comentario;
+    });
+    return showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      isScrollControlled: true,
+      builder: (_) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20))
+          ),
+          height: 560,
+          padding: EdgeInsets.only(top: 10, left: 20, right: 20),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Column(
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    CircleAvatar(
+                      radius: defaultpadding,
+                      backgroundImage: NetworkImage(imagen == "noimage"
+                          ? '$URL_SERVER/images/foto/$imagen.png'
+                          : '$URL_SERVER/images/foto/$imagen'),
+                    ),
+                    SizedBox(width: 6),
+                    Column(
+                      children: [
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          width: 250,
+                          height: 56,
+                          padding: EdgeInsets.only(left: 7, top: 3),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                child: TextFormField(
+                                  controller: txtenditar,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: 'Escribe tu comentario aquí...'),
+                                ),
+                              ),
+                              SizedBox(
+                                height: 5,
+                              ),
+                            ],
+                          ),
+                        ),
+                        SizedBox(
+                          height: 5,
+                        )
+                      ]
+                    ),
+                  ]
+                ),
+                SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.red, // background
+                        onPrimary: Colors.white, // foreground
+                      ),
+                      onPressed: () { Navigator.pop(context); },
+                      child: Text('Cancelar'),
+                    ),
+                    SizedBox(width: 10),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: kazul, // background
+                        onPrimary: Colors.white, // foreground
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                        editarComentario(idComentario, txtenditar.text);
+                      },
+                      child: Text('Guardar'),
+                    )
+                  ],
+                )
+              ],
+            ) 
+          )
+        );
+      }).whenComplete(() {
+    });
+  }
+
+  editarComentario(int idComentario, String comentario) async {
+    setState(() {
+      loading = true;
+    });
+    
+    String tipo = "contrato";
+    await http.get(Uri.parse('${URL_SERVER}editar-comentario?bd=$bd&id_com=$idComentario&tipo=$tipo&comentario=$comentario'),headers: {"Accept": "application/json"}); 
     listarcomentarios();
   }
 }

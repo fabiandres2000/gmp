@@ -2337,3 +2337,24 @@ Route::get('/eliminar-comentario', function () {
                 'respuesta' => $respuesta,
     ]);
 });
+
+Route::get('/editar-comentario', function () {
+    header("Access-Control-Allow-Origin: *");
+    $value = request()->get("bd");
+    $tipo = request()->get("tipo");
+	$data = request()->all();
+
+    if($tipo == "proyecto"){
+        $respuesta = DB::connection("mysql")->table($value.".comentarios_proyectos")
+        ->where("id",request()->get("id_com"))
+        ->update(['comentario' => request()->get("comentario")]); 
+    }else{
+        $respuesta = DB::connection("mysql")->table($value.".comentarios")
+        ->where("id",request()->get("id_com"))
+        ->update(['comentario' => request()->get("comentario")]); 
+    }
+
+    return response()->json([
+        'respuesta' => $respuesta,
+    ]);
+});
