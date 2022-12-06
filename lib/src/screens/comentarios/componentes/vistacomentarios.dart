@@ -181,6 +181,8 @@ class VistaComentario extends StatelessWidget {
     DateTime fecha2 =  DateTime.now();
 
     Duration _diastotales = fecha2.difference(fecha1);
+
+    List<String> meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo","Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     
     if(_diastotales.inDays == 0){
       return "Hoy ";
@@ -188,7 +190,12 @@ class VistaComentario extends StatelessWidget {
       if (_diastotales.inDays == 1) {
         return "Ayer ";
       }else{
-        return "Hace "+_diastotales.inDays.toString()+" dias ";
+        if(_diastotales.inDays <= 7){
+          return "Hace "+_diastotales.inDays.toString()+" dias ";
+        }else{
+          return fecha1.day.toString()+" de "+meses[fecha1.month]+" del "+fecha1.year.toString()+", ";
+        }
+        
       }
     }
   }

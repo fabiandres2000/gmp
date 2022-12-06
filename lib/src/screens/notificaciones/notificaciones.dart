@@ -93,8 +93,8 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         children: <Widget>[
-                                          Text(calcularFechas(notificacionesLista[index]['fecha'])+"A las ", style: TextStyle(fontStyle: FontStyle.italic)),
-                                          Text(notificacionesLista[index]['hora'], style: TextStyle(fontStyle: FontStyle.italic))
+                                          Text(calcularFechas(notificacionesLista[index]['fecha'])+"A las ", style: TextStyle(fontStyle: FontStyle.italic, fontSize: 10, fontWeight: FontWeight.bold)),
+                                          Text(notificacionesLista[index]['hora'], style: TextStyle(fontStyle: FontStyle.italic, fontSize: 10, fontWeight: FontWeight.bold))
                                         ],
                                       ),
                                     )
@@ -157,8 +157,8 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
                                         crossAxisAlignment: CrossAxisAlignment.end,
                                         mainAxisAlignment: MainAxisAlignment.end,
                                         children: <Widget>[
-                                          Text(calcularFechas(notificacionesListaNoLeidas[index]['fecha'])+"A las ", style: TextStyle(fontStyle: FontStyle.italic)),
-                                          Text(notificacionesListaNoLeidas[index]['hora'], style: TextStyle(fontStyle: FontStyle.italic))
+                                          Text(calcularFechas(notificacionesListaNoLeidas[index]['fecha'])+"A las ", style: TextStyle(fontStyle: FontStyle.italic, fontSize: 10, fontWeight: FontWeight.bold)),
+                                          Text(notificacionesListaNoLeidas[index]['hora'], style: TextStyle(fontStyle: FontStyle.italic, fontSize: 10, fontWeight: FontWeight.bold))
                                         ],
                                       ),
                                     )
@@ -214,6 +214,8 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
     DateTime fecha2 =  DateTime.now();
 
     Duration _diastotales = fecha2.difference(fecha1);
+
+    List<String> meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo","Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
     
     if(_diastotales.inDays == 0){
       return "Hoy ";
@@ -221,7 +223,12 @@ class _NotificacionesPageState extends State<NotificacionesPage> {
       if (_diastotales.inDays == 1) {
         return "Ayer ";
       }else{
-        return "Hace "+_diastotales.inDays.toString()+" dias ";
+        if(_diastotales.inDays <= 7){
+          return "Hace "+_diastotales.inDays.toString()+" dias ";
+        }else{
+          return fecha1.day.toString()+" de "+meses[fecha1.month]+" del "+fecha1.year.toString()+", ";
+        }
+        
       }
     }
   }
