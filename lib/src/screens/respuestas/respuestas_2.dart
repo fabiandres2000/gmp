@@ -255,12 +255,10 @@ class _RespuestasNotPageState extends State<RespuestasNotPage> {
                         indicatorColor: Colors.blue,
                         iconColor: Colors.grey,
                         iconColorSelected: Colors.blue,
-                        progressIndicatorColor: Colors.blue,
                         backspaceColor: Colors.blue,
                         skinToneDialogBgColor: Colors.white,
                         skinToneIndicatorColor: Colors.grey,
                         enableSkinTones: true,
-                        showRecentsTab: true,
                         recentsLimit: 28,
                         noRecents: const Text(
                           'No Recents',

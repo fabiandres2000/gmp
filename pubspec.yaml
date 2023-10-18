@@ -61,12 +61,12 @@ dependencies:
   motion_toast: ^1.2.0
   blurry_modal_progress_hud: ^1.0.3
   expansion_card: ^0.1.0
-  sweetalert: ^0.0.1
   url_launcher: ^6.1.2
   shimmer: ^2.0.0
   flutter_pdfview: ^1.2.1
   emoji_picker_flutter: ^1.2.1
   awesome_dialog: ^2.2.1
+  firebase_core_platform_interface: 4.5.1
 
 dev_dependencies:
   flutter_test:

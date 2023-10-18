@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:gmp/src/screens/comentarios/comentarioscontratos.dart';
@@ -181,9 +181,9 @@ class _DetalleContratosPageState extends State<DetalleContratosPage> {
                                 fontWeight: FontWeight.w500,
                                 fontSize: 16),
                           ),
-                          Badge(
+                          badges.Badge(
                             toAnimate: false,
-                            shape: BadgeShape.square,
+                            shape: badges.BadgeShape.square,
                             badgeColor: color,
                             borderRadius: BorderRadius.circular(8),
                             badgeContent: Text(

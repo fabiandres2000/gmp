@@ -14,7 +14,6 @@ import 'package:geocoding/geocoding.dart' as direccion;
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:expansion_card/expansion_card.dart';
-import 'package:sweetalert/sweetalert.dart';
 
 
 class GeolocalizacionNueva extends StatefulWidget {
@@ -485,11 +484,12 @@ class _CGeolocalizacionNuevaPageState extends State<GeolocalizacionNueva> {
     }else{
       setState(() {
         loading = false;
-        mostrarDialogoError(this.context);
+        //mostrarDialogoError(this.context);
       });
     }
   }
 
+/*
   mostrarDialogoError(BuildContext context){
      SweetAlert.show(
       context,
@@ -499,7 +499,7 @@ class _CGeolocalizacionNuevaPageState extends State<GeolocalizacionNueva> {
       style: SweetAlertStyle.error
     );
   }
-
+*/
 
 
   obtenerSecertarias(String bd, var item) async {
